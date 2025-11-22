@@ -338,7 +338,7 @@ while True:
 
             target_ip = raw_input(Fore.RED + "Enter Target IP: ")
             target_port = raw_input(Fore.RED + "Enter {} Port: ".format(target_type))
-            username_input = raw_input(Fore.CYAN + "Enter Username Wordlist(.txt): ")
+            username_input = raw_input(Fore.CYAN + "Enter Username/Username Wordlist: ")
             password_input = raw_input(Fore.CYAN + "Enter Password Wordlist (.txt): ")
 
             usernames = load_list(username_input)
