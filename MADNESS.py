@@ -251,7 +251,7 @@ while True:
             value = value.strip()
             if not value:
                 print("INVALID WORDLIST OR INPUT.")
-                raw_input(" Press Enter to return to menu...")
+                sys.exit(1)
 
             if os.path.isfile(value):
                 if os.path.getsize(value) == 0:
