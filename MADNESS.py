@@ -105,7 +105,7 @@ while True:
     print(Fore.RED + credits)
     print(Fore.BLUE + legal)
     print(Fore.RED + barrier)
-    print(Fore.MAGENTA + "[1] FlameGRAVE DDos Tool")
+    print(Fore.MAGENTA + "[1] FlameGRAVE DDoS Tool")
     print(Fore.CYAN + "[2] MadSpam SMS Bomber")
     print(Fore.GREEN + "[3] SCANNIT IP Lookup")
     print(Fore.RED + "[4] RedRipper BRUTE-FORCE Tool-Kit")
